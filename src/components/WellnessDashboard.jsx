@@ -44,6 +44,27 @@ export default function WellnessDashboard({ entries, deleteEntry, streak, setAct
   const latestEntry = entries[0];
   const analysis = latestEntry.analysis || {};
 
+  // Calculate stress triggers and emotion counts for aggregates
+  const triggerCounts = {};
+  const emotionCounts = {};
+  entries.forEach(e => {
+    // Triggers
+    if (e.analysis?.triggers) {
+      e.analysis.triggers.forEach(t => {
+        triggerCounts[t] = (triggerCounts[t] || 0) + 1;
+      });
+    }
+    // Emotions/Mood
+    const emo = e.analysis?.emotion || e.mood;
+    if (emo) {
+      emotionCounts[emo] = (emotionCounts[emo] || 0) + 1;
+    }
+  });
+
+  const totalJournalCount = entries.length;
+  const sortedTriggers = Object.entries(triggerCounts).sort((a, b) => b[1] - a[1]).slice(0, 4);
+  const sortedEmotions = Object.entries(emotionCounts).sort((a, b) => b[1] - a[1]).slice(0, 4);
+
   // Custom SVG Chart calculations
   const chartWidth = 500;
   const chartHeight = 150;
@@ -262,6 +283,83 @@ export default function WellnessDashboard({ entries, deleteEntry, streak, setAct
               Submit another daily journal entry to visualize your wellness chart.
             </div>
           )}
+        </div>
+
+        {/* Aggregated Stress Analytics Card */}
+        <div className="card">
+          <h3 style={{ fontSize: '1.1rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Sparkles size={18} color="var(--indigo)" aria-hidden="true" />
+            <span>Stress & Emotion Patterns</span>
+          </h3>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginBottom: '1.25rem', lineHeight: '1.5' }}>
+            Aggregated patterns across all your logs to uncover recurrent academic pressure points and emotional triggers.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            {/* Stress Triggers */}
+            <div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: '0.75rem' }}>
+                TOP ACADEMIC STRESSORS:
+              </span>
+              {sortedTriggers.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {sortedTriggers.map(([trig, count], idx) => {
+                    const pct = Math.round((count / totalJournalCount) * 100);
+                    return (
+                      <div key={idx}>
+                        <div className="flex-between" style={{ fontSize: '0.75rem', marginBottom: '0.25rem' }}>
+                          <span style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{trig}</span>
+                          <span style={{ color: 'var(--text-muted)' }}>{count}x ({pct}%)</span>
+                        </div>
+                        <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                          <div style={{ width: `${pct}%`, height: '100%', background: 'var(--indigo)', borderRadius: '2px' }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>No stressors detected yet.</span>
+              )}
+            </div>
+
+            {/* Emotional Breakdown */}
+            <div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: '0.75rem' }}>
+                EMOTIONAL DISPOSITION:
+              </span>
+              {sortedEmotions.length > 0 ? (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  {sortedEmotions.map(([emo, count], idx) => (
+                    <div 
+                      key={idx} 
+                      style={{
+                        padding: '0.35rem 0.6rem',
+                        fontSize: '0.75rem',
+                        background: `${getMoodColor(emo)}10`,
+                        border: `1px solid ${getMoodColor(emo)}30`,
+                        borderRadius: '4px',
+                        color: getMoodColor(emo),
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        fontWeight: 600
+                      }}
+                    >
+                      <span>{emo}</span>
+                      <span style={{
+                        background: `${getMoodColor(emo)}20`,
+                        padding: '0.05rem 0.25rem',
+                        borderRadius: '2px',
+                        fontSize: '0.65rem'
+                      }}>{count}x</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>No emotional logs yet.</span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

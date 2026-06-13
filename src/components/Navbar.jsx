@@ -66,7 +66,6 @@ export default function Navbar({ activeTab, setActiveTab, exam, openSettings, st
               className="btn btn-secondary nav-tab-btn"
               id={`nav-${tab.id}`}
               aria-current={isActive ? 'page' : undefined}
-              aria-selected={isActive ? 'true' : 'false'}
               style={{
                 background: isActive ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
                 borderColor: isActive ? 'rgba(99, 102, 241, 0.3)' : 'transparent',
@@ -95,6 +94,7 @@ export default function Navbar({ activeTab, setActiveTab, exam, openSettings, st
           className="tooltip"
           role="status"
           aria-label={`Daily streak: ${streak} days`}
+          aria-describedby="streak-tooltip"
         >
           <Flame size={18} color="#f97316" style={{ filter: 'drop-shadow(0 0 4px rgba(249, 115, 22, 0.4))' }} aria-hidden="true" />
           <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f97316' }}>{streak}d Streak</span>

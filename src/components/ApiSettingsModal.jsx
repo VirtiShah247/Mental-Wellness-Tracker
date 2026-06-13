@@ -146,6 +146,8 @@ export default function ApiSettingsModal({ isOpen, onClose, apiKey, setApiKey, m
               placeholder="sk-proj-..."
               value={tempKey}
               onChange={(e) => setTempKey(e.target.value)}
+              autoComplete="off"
+              spellCheck="false"
               style={{ paddingRight: '2.5rem' }}
             />
             <button
