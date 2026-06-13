@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Wind, Play, Square, Compass, Clock, Award, ShieldAlert } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Wind, Play, Square, Compass, Clock, Award } from 'lucide-react';
 
 export default function MindfulnessGuide() {
   const [breatheActive, setBreatheActive] = useState(false);
@@ -12,6 +12,11 @@ export default function MindfulnessGuide() {
   const [activeMeditation, setActiveMeditation] = useState(null);
 
   const timerRef = useRef(null);
+  const completedCyclesRef = useRef(completedCycles);
+
+  useEffect(() => {
+    completedCyclesRef.current = completedCycles;
+  }, [completedCycles]);
 
   const meditations = [
     {
@@ -80,14 +85,10 @@ export default function MindfulnessGuide() {
   useEffect(() => {
     if (!breatheActive) {
       clearInterval(timerRef.current);
-      setBreathePhase('Start');
-      setPhaseSeconds(4);
       return;
     }
 
-    // Set initial phase
-    setBreathePhase('Inhale');
-    setPhaseSeconds(4);
+    // timerRef setup
 
     timerRef.current = setInterval(() => {
       setPhaseSeconds((prev) => {
@@ -105,7 +106,7 @@ export default function MindfulnessGuide() {
                   nextSeconds = 4;
                   break;
                 case 'Hold':
-                  if (completedCycles % 2 === 0) {
+                  if (completedCyclesRef.current % 2 === 0) {
                     nextPhase = 'Exhale';
                     nextSeconds = 4;
                   } else {
@@ -223,14 +224,14 @@ export default function MindfulnessGuide() {
         {/* Breathing cycle selector */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '2rem' }}>
           <button
-            onClick={() => { setBreatheCycle('box'); setBreatheActive(false); }}
+            onClick={() => { setBreatheCycle('box'); setBreatheActive(false); setBreathePhase('Start'); setPhaseSeconds(4); }}
             className={`btn ${breatheCycle === 'box' ? 'btn-primary' : 'btn-secondary'}`}
             style={{ padding: '0.4rem 0.85rem', fontSize: '0.8rem', borderRadius: '4px' }}
           >
             Box Breathing (4s-4s-4s-4s)
           </button>
           <button
-            onClick={() => { setBreatheCycle('calm'); setBreatheActive(false); }}
+            onClick={() => { setBreatheCycle('calm'); setBreatheActive(false); setBreathePhase('Start'); setPhaseSeconds(4); }}
             className={`btn ${breatheCycle === 'calm' ? 'btn-primary' : 'btn-secondary'}`}
             style={{ padding: '0.4rem 0.85rem', fontSize: '0.8rem', borderRadius: '4px' }}
           >
@@ -269,11 +270,11 @@ export default function MindfulnessGuide() {
 
         <div style={{ marginTop: '2rem' }}>
           {breatheActive ? (
-            <button className="btn btn-danger" onClick={() => setBreatheActive(false)} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button className="btn btn-danger" onClick={() => { setBreatheActive(false); setBreathePhase('Start'); setPhaseSeconds(4); }} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
               <Square size={16} aria-hidden="true" /> Stop Exercise
             </button>
           ) : (
-            <button className="btn btn-primary" onClick={() => { setBreatheActive(true); setCompletedCycles(0); }} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button className="btn btn-primary" onClick={() => { setBreatheActive(true); setBreathePhase('Inhale'); setPhaseSeconds(4); setCompletedCycles(0); }} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
               <Play size={16} aria-hidden="true" /> Start Breathing
             </button>
           )}

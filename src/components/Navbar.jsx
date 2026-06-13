@@ -1,4 +1,3 @@
-import React from 'react';
 import { LayoutDashboard, BookOpen, Wind, MessageSquareHeart, AlertCircle, Settings, Flame } from 'lucide-react';
 
 export default function Navbar({ activeTab, setActiveTab, exam, openSettings, streak }) {

@@ -1,6 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, AlertCircle, Bot, User, Trash2, ShieldAlert } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Send, Bot, User, Trash2 } from 'lucide-react';
 import { getChatResponse } from '../utils/openai';
+
+let msgCounter = 0;
+const generateMsgId = () => `${Date.now()}-${msgCounter++}`;
 
 export default function ChatCompanion({ apiKey, model, exam, entries }) {
   const [messages, setMessages] = useState([
@@ -36,7 +39,7 @@ export default function ChatCompanion({ apiKey, model, exam, entries }) {
 
     // Add user message
     const userMessage = {
-      id: Date.now().toString(),
+      id: generateMsgId(),
       role: 'user',
       content: query,
       timestamp: new Date().toISOString()
@@ -57,13 +60,13 @@ export default function ChatCompanion({ apiKey, model, exam, entries }) {
       );
 
       setMessages(prev => [...prev, {
-        id: Date.now().toString() + '-reply',
+        id: generateMsgId() + '-reply',
         ...reply
       }]);
     } catch (error) {
       console.error(error);
       setMessages(prev => [...prev, {
-        id: Date.now().toString() + '-error',
+        id: generateMsgId() + '-error',
         role: 'assistant',
         content: `I'm having trouble processing that right now. Remember, I'm here to support you. Let's take a deep breath together.`,
         timestamp: new Date().toISOString(),

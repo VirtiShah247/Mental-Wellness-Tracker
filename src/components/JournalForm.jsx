@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PenTool, BrainCircuit, Sparkles, AlertCircle, HelpCircle, Trophy } from 'lucide-react';
 import { analyzeJournalEntry } from '../utils/openai';
 

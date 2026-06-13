@@ -1,5 +1,4 @@
-import React from 'react';
-import { ShieldAlert, PhoneCall, HeartHandshake, Compass, ExternalLink, HelpCircle } from 'lucide-react';
+import { ShieldAlert, PhoneCall, HeartHandshake, Compass, ExternalLink } from 'lucide-react';
 
 export default function SafetyBanner({ setActiveTab }) {
   const emergencyHelplines = [

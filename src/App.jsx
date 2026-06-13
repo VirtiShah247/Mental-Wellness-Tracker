@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Navbar from './components/Navbar';
 import JournalForm from './components/JournalForm';
 import WellnessDashboard from './components/WellnessDashboard';
@@ -43,40 +43,77 @@ const seedEntries = [
   }
 ];
 
+// Helper to calculate daily journaling streaks
+const calculateStreak = (entriesList) => {
+  if (!entriesList || entriesList.length === 0) return 0;
+  
+  // Sort chronological descending
+  const sorted = [...entriesList].sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+  // Extrapolate local dates YYYY-MM-DD
+  const dates = sorted
+    .map(e => new Date(e.date).toLocaleDateString())
+    .filter((value, index, self) => self.indexOf(value) === index); // Unique values
+
+  if (dates.length === 0) return 0;
+
+  const todayStr = new Date().toLocaleDateString();
+  
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toLocaleDateString();
+
+  // If latest entry isn't today or yesterday, streak is broken
+  if (dates[0] !== todayStr && dates[0] !== yesterdayStr) {
+    return 0;
+  }
+
+  let currentStreak = 1;
+  let checkDate = new Date(sorted[0].date);
+
+  for (let i = 1; i < sorted.length; i++) {
+    const nextDate = new Date(sorted[i].date);
+    
+    // Diff in days
+    const diffTime = Math.abs(checkDate.setHours(0,0,0,0) - nextDate.setHours(0,0,0,0));
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 1) {
+      currentStreak++;
+      checkDate = nextDate;
+    } else if (diffDays > 1) {
+      break; // Gap found, stop counting
+    }
+  }
+
+  return currentStreak;
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [entries, setEntries] = useState([]);
-  const [exam, setExam] = useState('JEE');
-  const [apiKey, setApiKey] = useState('');
-  const [model, setModel] = useState('gpt-4o-mini');
+  const [entries, setEntries] = useState(() => {
+    const cached = localStorage.getItem('zenith_journal_entries');
+    if (cached) return JSON.parse(cached);
+    localStorage.setItem('zenith_journal_entries', JSON.stringify(seedEntries));
+    return seedEntries;
+  });
+  const [exam, setExam] = useState(() => {
+    return localStorage.getItem('zenith_exam_type') || 'JEE';
+  });
+  const [apiKey, setApiKey] = useState(() => {
+    return localStorage.getItem('zenith_openai_key') || '';
+  });
+  const [model, setModel] = useState(() => {
+    return localStorage.getItem('zenith_openai_model') || 'gpt-4o-mini';
+  });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [streak, setStreak] = useState(2); // Start with 2d streak based on seed data
+  const [streak, setStreak] = useState(() => {
+    const cached = localStorage.getItem('zenith_journal_entries');
+    const parsed = cached ? JSON.parse(cached) : seedEntries;
+    return calculateStreak(parsed);
+  });
 
-  // 1. Initial State Hydration
-  useEffect(() => {
-    const cachedEntries = localStorage.getItem('zenith_journal_entries');
-    if (cachedEntries) {
-      const parsed = JSON.parse(cachedEntries);
-      setEntries(parsed);
-      setStreak(calculateStreak(parsed));
-    } else {
-      // Seed default entries
-      localStorage.setItem('zenith_journal_entries', JSON.stringify(seedEntries));
-      setEntries(seedEntries);
-      setStreak(2);
-    }
-
-    const cachedExam = localStorage.getItem('zenith_exam_type');
-    if (cachedExam) setExam(cachedExam);
-
-    const cachedKey = localStorage.getItem('zenith_openai_key');
-    if (cachedKey) setApiKey(cachedKey);
-
-    const cachedModel = localStorage.getItem('zenith_openai_model');
-    if (cachedModel) setModel(cachedModel);
-  }, []);
-
-  // 2. State persistence watchers
+  // State persistence watchers
   const handleSetApiKey = (key) => {
     setApiKey(key);
     localStorage.setItem('zenith_openai_key', key);
@@ -90,52 +127,6 @@ export default function App() {
   const handleSetExam = (selectedExam) => {
     setExam(selectedExam);
     localStorage.setItem('zenith_exam_type', selectedExam);
-  };
-
-  // 3. Helper to calculate daily journaling streaks
-  const calculateStreak = (entriesList) => {
-    if (!entriesList || entriesList.length === 0) return 0;
-    
-    // Sort chronological descending
-    const sorted = [...entriesList].sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    // Extrapolate local dates YYYY-MM-DD
-    const dates = sorted
-      .map(e => new Date(e.date).toLocaleDateString())
-      .filter((value, index, self) => self.indexOf(value) === index); // Unique values
-
-    if (dates.length === 0) return 0;
-
-    const todayStr = new Date().toLocaleDateString();
-    
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toLocaleDateString();
-
-    // If latest entry isn't today or yesterday, streak is broken
-    if (dates[0] !== todayStr && dates[0] !== yesterdayStr) {
-      return 0;
-    }
-
-    let currentStreak = 1;
-    let checkDate = new Date(sorted[0].date);
-
-    for (let i = 1; i < sorted.length; i++) {
-      const nextDate = new Date(sorted[i].date);
-      
-      // Diff in days
-      const diffTime = Math.abs(checkDate.setHours(0,0,0,0) - nextDate.setHours(0,0,0,0));
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      if (diffDays === 1) {
-        currentStreak++;
-        checkDate = nextDate;
-      } else if (diffDays > 1) {
-        break; // Gap found, stop counting
-      }
-    }
-
-    return currentStreak;
   };
 
   // 4. Entry management functions

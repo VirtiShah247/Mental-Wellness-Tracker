@@ -17,9 +17,9 @@ const runMockAnalysis = (text, exam) => {
   const triggers = [];
   const distortions = [];
   let sentimentScore = 70; // Default baseline
-  let primaryEmotion = "Focused";
-  let summary = "";
-  let coping = "";
+  let primaryEmotion;
+  let summary;
+  let coping;
 
   // 1. Analyze Keywords for Triggers & Distortions
   if (lowercaseText.includes('test') || lowercaseText.includes('mock') || lowercaseText.includes('score') || lowercaseText.includes('percentile') || lowercaseText.includes('rank') || lowercaseText.includes('marks')) {
@@ -54,7 +54,6 @@ const runMockAnalysis = (text, exam) => {
   }
 
   if (lowercaseText.includes('worry') || lowercaseText.includes('fear') || lowercaseText.includes('anxious') || lowercaseText.includes('panic') || lowercaseText.includes('scared') || lowercaseText.includes('nervous')) {
-    primaryEmotion = "Anxious";
     sentimentScore -= 10;
   }
 
@@ -120,7 +119,7 @@ const runMockAnalysis = (text, exam) => {
  */
 const runMockChatResponse = (messages, exam, lastAnalysis) => {
   const lastUserMessage = [...messages].reverse().find(m => m.role === 'user')?.content.toLowerCase() || '';
-  let reply = "";
+  let reply;
 
   const examLabel = exam || "your exam";
 

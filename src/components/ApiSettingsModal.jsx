@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Key, ShieldCheck, HelpCircle, Eye, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
-import { hasValidKey } from '../utils/openai';
+import { useState, useEffect } from 'react';
+import { X, Key, ShieldCheck, Eye, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function ApiSettingsModal({ isOpen, onClose, apiKey, setApiKey, model, setModel }) {
   const [tempKey, setTempKey] = useState(apiKey || '');

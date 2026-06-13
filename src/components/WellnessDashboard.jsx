@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Sparkles, Trash2, Calendar, ShieldAlert, ChevronDown, ChevronUp, AlertCircle, HelpCircle, Trophy, BookOpen } from 'lucide-react';
+import { useState } from 'react';
+import { Sparkles, Trash2, Calendar, ShieldAlert, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
 
 export default function WellnessDashboard({ entries, deleteEntry, streak, setActiveTab }) {
   const [expandedEntryId, setExpandedEntryId] = useState(null);
@@ -65,9 +65,6 @@ export default function WellnessDashboard({ entries, deleteEntry, streak, setAct
     svgPath = `M ${points[0].x} ${points[0].y} ` + points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
     svgAreaPath = `${svgPath} L ${points[points.length - 1].x} ${chartHeight - padding} L ${points[0].x} ${chartHeight - padding} Z`;
   }
-
-  // Get unique all-time triggers
-  const allTriggers = Array.from(new Set(entries.flatMap(e => e.analysis?.triggers || []))).slice(0, 5);
 
   // Helper for mood coloring
   const getMoodColor = (mood) => {
