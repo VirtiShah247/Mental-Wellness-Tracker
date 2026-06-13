@@ -255,7 +255,11 @@ export default function MindfulnessGuide() {
           transition: 'transform 3.8s ease-in-out, background-color 1s, box-shadow 1s'
         }}>
           {/* Internal text info */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div 
+            aria-live="polite" 
+            aria-atomic="true"
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+          >
             <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'white' }}>{activeStyle.text}</span>
             {breatheActive && (
               <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'white', marginTop: '0.25rem' }}>{phaseSeconds}s</span>
@@ -266,17 +270,17 @@ export default function MindfulnessGuide() {
         <div style={{ marginTop: '2rem' }}>
           {breatheActive ? (
             <button className="btn btn-danger" onClick={() => setBreatheActive(false)} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Square size={16} /> Stop Exercise
+              <Square size={16} aria-hidden="true" /> Stop Exercise
             </button>
           ) : (
             <button className="btn btn-primary" onClick={() => { setBreatheActive(true); setCompletedCycles(0); }} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Play size={16} /> Start Breathing
+              <Play size={16} aria-hidden="true" /> Start Breathing
             </button>
           )}
         </div>
 
         {breatheActive && (
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '1rem' }}>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '1rem' }} role="status">
             Cycles Completed: <strong>{completedCycles}</strong>. Keep going for at least 4 cycles.
           </p>
         )}
@@ -285,7 +289,7 @@ export default function MindfulnessGuide() {
       {/* RIGHT COLUMN: Guided Meditations */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-          <Compass size={22} color="var(--violet)" />
+          <Compass size={22} color="var(--violet)" aria-hidden="true" />
           <h2 style={{ fontSize: '1.35rem', margin: 0 }}>Tailored Guided Meditations</h2>
         </div>
 
@@ -300,7 +304,16 @@ export default function MindfulnessGuide() {
                 borderLeft: `4px solid ${med.color}`,
                 transition: 'all var(--transition-fast)'
               }}>
-                <div className="flex-between" style={{ cursor: 'pointer' }} onClick={() => setActiveMeditation(isOpened ? null : med)}>
+                <div 
+                  className="flex-between" 
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isOpened}
+                  aria-controls={`med-steps-${med.id}`}
+                  onClick={() => setActiveMeditation(isOpened ? null : med)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveMeditation(isOpened ? null : med); } }}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <div style={{
                       width: '2.25rem',
@@ -312,7 +325,7 @@ export default function MindfulnessGuide() {
                       justifyContent: 'center',
                       color: med.color
                     }}>
-                      <MedIcon size={16} />
+                      <MedIcon size={16} aria-hidden="true" />
                     </div>
                     <div>
                       <h4 style={{ fontSize: '0.95rem', margin: 0, fontWeight: 700 }}>{med.title}</h4>
@@ -320,17 +333,20 @@ export default function MindfulnessGuide() {
                     </div>
                   </div>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                    <Clock size={12} /> {med.duration}
+                    <Clock size={12} aria-hidden="true" /> {med.duration}
                   </span>
                 </div>
 
                 {isOpened && (
-                  <div style={{
-                    marginTop: '1.25rem',
-                    borderTop: '1px solid var(--border-color)',
-                    paddingTop: '1rem',
-                    animation: 'fadeIn var(--transition-fast) forwards'
-                  }}>
+                  <div 
+                    id={`med-steps-${med.id}`}
+                    style={{
+                      marginTop: '1.25rem',
+                      borderTop: '1px solid var(--border-color)',
+                      paddingTop: '1rem',
+                      animation: 'fadeIn var(--transition-fast) forwards'
+                    }}
+                  >
                     <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                       {med.steps.map((step, idx) => (
                         <li key={idx} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start', fontSize: '0.85rem', lineHeight: '1.5' }}>
@@ -347,7 +363,7 @@ export default function MindfulnessGuide() {
                             color: med.color,
                             flexShrink: 0,
                             marginTop: '2px'
-                          }}>
+                          }} aria-hidden="true">
                             {idx + 1}
                           </span>
                           <span style={{ color: 'var(--text-primary)' }}>{step}</span>

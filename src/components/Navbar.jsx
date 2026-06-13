@@ -11,7 +11,7 @@ export default function Navbar({ activeTab, setActiveTab, exam, openSettings, st
   ];
 
   return (
-    <header className="glass navbar-container" style={{
+    <header className="glass navbar-container" role="banner" style={{
       position: 'sticky',
       top: '1rem',
       zIndex: 50,
@@ -27,7 +27,14 @@ export default function Navbar({ activeTab, setActiveTab, exam, openSettings, st
       boxShadow: 'var(--shadow-lg)'
     }}>
       {/* Brand logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }} onClick={() => setActiveTab('dashboard')}>
+      <div 
+        role="button"
+        tabIndex={0}
+        aria-label="Zenith AI Home"
+        onClick={() => setActiveTab('dashboard')}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTab('dashboard'); } }}
+        style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}
+      >
         <div style={{
           width: '2.5rem',
           height: '2.5rem',
@@ -38,7 +45,7 @@ export default function Navbar({ activeTab, setActiveTab, exam, openSettings, st
           justifyContent: 'center',
           boxShadow: '0 0 15px rgba(99, 102, 241, 0.4)'
         }}>
-          <Wind size={20} color="white" />
+          <Wind size={20} color="white" aria-hidden="true" />
         </div>
         <div>
           <h1 style={{ fontSize: '1.25rem', margin: 0, fontWeight: 800, letterSpacing: '-0.03em' }}>
@@ -49,7 +56,7 @@ export default function Navbar({ activeTab, setActiveTab, exam, openSettings, st
       </div>
 
       {/* Navigation tabs */}
-      <nav style={{ display: 'flex', gap: '0.25rem', overflowX: 'auto', padding: '0.25rem 0' }}>
+      <nav aria-label="Primary Site Navigation" style={{ display: 'flex', gap: '0.25rem', overflowX: 'auto', padding: '0.25rem 0' }}>
         {tabs.map((tab) => {
           const IconComponent = tab.icon;
           const isActive = activeTab === tab.id;
@@ -59,6 +66,8 @@ export default function Navbar({ activeTab, setActiveTab, exam, openSettings, st
               onClick={() => setActiveTab(tab.id)}
               className="btn btn-secondary nav-tab-btn"
               id={`nav-${tab.id}`}
+              aria-current={isActive ? 'page' : undefined}
+              aria-selected={isActive ? 'true' : 'false'}
               style={{
                 background: isActive ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
                 borderColor: isActive ? 'rgba(99, 102, 241, 0.3)' : 'transparent',
@@ -72,7 +81,7 @@ export default function Navbar({ activeTab, setActiveTab, exam, openSettings, st
                 transition: 'all var(--transition-fast)'
               }}
             >
-              <IconComponent size={16} color={isActive ? 'var(--indigo)' : 'var(--text-secondary)'} />
+              <IconComponent size={16} color={isActive ? 'var(--indigo)' : 'var(--text-secondary)'} aria-hidden="true" />
               <span className="nav-label" style={{ fontWeight: isActive ? '600' : '400' }}>{tab.label}</span>
             </button>
           );
@@ -82,24 +91,33 @@ export default function Navbar({ activeTab, setActiveTab, exam, openSettings, st
       {/* Quick stats & Settings */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
         {/* Streak counter */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }} className="tooltip">
-          <Flame size={18} color="#f97316" style={{ filter: 'drop-shadow(0 0 4px rgba(249, 115, 22, 0.4))' }} />
+        <div 
+          style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }} 
+          className="tooltip"
+          role="status"
+          aria-label={`Daily streak: ${streak} days`}
+        >
+          <Flame size={18} color="#f97316" style={{ filter: 'drop-shadow(0 0 4px rgba(249, 115, 22, 0.4))' }} aria-hidden="true" />
           <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f97316' }}>{streak}d Streak</span>
-          <span className="tooltip-text">Daily journal check-in streak</span>
+          <span className="tooltip-text" id="streak-tooltip">Daily journal check-in streak</span>
         </div>
 
         {/* Selected exam badge */}
         {exam && (
-          <div style={{
-            padding: '0.25rem 0.6rem',
-            background: 'rgba(139, 92, 246, 0.15)',
-            border: '1px solid rgba(139, 92, 246, 0.3)',
-            borderRadius: '9999px',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            color: '#c084fc',
-            textTransform: 'uppercase'
-          }}>
+          <div 
+            role="status"
+            aria-label={`Selected target exam: ${exam}`}
+            style={{
+              padding: '0.25rem 0.6rem',
+              background: 'rgba(139, 92, 246, 0.15)',
+              border: '1px solid rgba(139, 92, 246, 0.3)',
+              borderRadius: '9999px',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              color: '#c084fc',
+              textTransform: 'uppercase'
+            }}
+          >
             {exam}
           </div>
         )}
@@ -109,6 +127,7 @@ export default function Navbar({ activeTab, setActiveTab, exam, openSettings, st
           onClick={openSettings}
           className="btn btn-secondary"
           id="btn-settings"
+          aria-label="Open settings and API configuration"
           style={{
             padding: '0.5rem',
             borderRadius: 'var(--border-radius-sm)',
@@ -118,7 +137,7 @@ export default function Navbar({ activeTab, setActiveTab, exam, openSettings, st
             justifyContent: 'center'
           }}
         >
-          <Settings size={18} color="var(--text-secondary)" />
+          <Settings size={18} color="var(--text-secondary)" aria-hidden="true" />
         </button>
       </div>
     </header>

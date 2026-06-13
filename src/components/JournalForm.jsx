@@ -85,7 +85,7 @@ export default function JournalForm({ apiKey, model, exam, setExam, addEntry, se
       {/* Journaling Form Column */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-          <PenTool size={20} color="var(--indigo)" />
+          <PenTool size={20} color="var(--indigo)" aria-hidden="true" />
           <h2 style={{ fontSize: '1.35rem', margin: 0 }}>Daily Well-being Log</h2>
         </div>
 
@@ -93,8 +93,13 @@ export default function JournalForm({ apiKey, model, exam, setExam, addEntry, se
           
           {/* Exam Selection */}
           <div>
-            <label className="label">Target Exam</label>
-            <select className="select" value={exam} onChange={(e) => setExam(e.target.value)}>
+            <label htmlFor="exam-select" className="label">Target Exam</label>
+            <select 
+              id="exam-select"
+              className="select" 
+              value={exam} 
+              onChange={(e) => setExam(e.target.value)}
+            >
               {examsList.map((ex) => (
                 <option key={ex.value} value={ex.value}>{ex.label}</option>
               ))}
@@ -103,8 +108,12 @@ export default function JournalForm({ apiKey, model, exam, setExam, addEntry, se
 
           {/* Quick Mood Emojis */}
           <div>
-            <label className="label">Current Emotional State</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <label id="mood-group-label" className="label">Current Emotional State</label>
+            <div 
+              role="group" 
+              aria-labelledby="mood-group-label"
+              style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}
+            >
               {moodOptions.map((opt) => {
                 const isSelected = mood === opt.name;
                 return (
@@ -113,6 +122,8 @@ export default function JournalForm({ apiKey, model, exam, setExam, addEntry, se
                     type="button"
                     onClick={() => setMood(opt.name)}
                     className="tooltip"
+                    aria-pressed={isSelected ? "true" : "false"}
+                    aria-label={`${opt.name}: ${opt.desc}`}
                     style={{
                       padding: '0.6rem 0.8rem',
                       background: isSelected ? `${opt.color}20` : 'rgba(255, 255, 255, 0.02)',
@@ -128,11 +139,11 @@ export default function JournalForm({ apiKey, model, exam, setExam, addEntry, se
                       boxShadow: isSelected ? `0 0 10px ${opt.color}30` : 'none'
                     }}
                   >
-                    <span>{opt.emoji}</span>
+                    <span role="img" aria-label={opt.name}>{opt.emoji}</span>
                     <span style={{ fontSize: '0.85rem', fontWeight: isSelected ? 700 : 400, color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
                       {opt.name}
                     </span>
-                    <span className="tooltip-text">{opt.desc}</span>
+                    <span className="tooltip-text" id={`mood-desc-${opt.name}`}>{opt.desc}</span>
                   </button>
                 );
               })}
@@ -146,20 +157,25 @@ export default function JournalForm({ apiKey, model, exam, setExam, addEntry, se
             borderRadius: 'var(--border-radius-sm)',
             padding: '0.85rem 1rem'
           }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <input
+                id="mock-test-checkbox"
                 type="checkbox"
                 checked={hasMockTest}
                 onChange={(e) => setHasMockTest(e.target.checked)}
                 style={{ width: '16px', height: '16px', accentColor: 'var(--indigo)' }}
               />
-              <span>Did you take a Mock Test today?</span>
-            </label>
+              <label htmlFor="mock-test-checkbox" style={{ cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}>
+                Did you take a Mock Test today?
+              </label>
+            </div>
 
             {hasMockTest && (
               <div style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem', animation: 'fadeIn var(--transition-fast) forwards' }}>
                 <div style={{ flex: 2 }}>
+                  <label htmlFor="mock-subject" className="sr-only" style={{ display: 'none' }}>Mock test subject or topics</label>
                   <input
+                    id="mock-subject"
                     type="text"
                     placeholder="Subject/Topics (e.g. Physics - Mechanics)"
                     className="input"
@@ -167,10 +183,13 @@ export default function JournalForm({ apiKey, model, exam, setExam, addEntry, se
                     onChange={(e) => setMockSubject(e.target.value)}
                     style={{ fontSize: '0.85rem', padding: '0.5rem 0.75rem' }}
                     required
+                    aria-label="Mock test subject or topics"
                   />
                 </div>
                 <div style={{ flex: 1 }}>
+                  <label htmlFor="mock-score" className="sr-only" style={{ display: 'none' }}>Mock test score or percentile</label>
                   <input
+                    id="mock-score"
                     type="text"
                     placeholder="Score/Percentile (e.g. 94% or 120/300)"
                     className="input"
@@ -178,6 +197,7 @@ export default function JournalForm({ apiKey, model, exam, setExam, addEntry, se
                     onChange={(e) => setMockScore(e.target.value)}
                     style={{ fontSize: '0.85rem', padding: '0.5rem 0.75rem' }}
                     required
+                    aria-label="Mock test score or percentile"
                   />
                 </div>
               </div>
@@ -187,34 +207,39 @@ export default function JournalForm({ apiKey, model, exam, setExam, addEntry, se
           {/* Journal Text */}
           <div>
             <div className="flex-between">
-              <label className="label">Open-ended Journal & Stress Vent</label>
-              <span style={{ fontSize: '0.75rem', color: wordCount >= 10 ? 'var(--text-secondary)' : 'var(--color-stressed)', fontWeight: 500 }}>
+              <label htmlFor="journal-text" className="label">Open-ended Journal & Stress Vent</label>
+              <span id="journal-word-counter" style={{ fontSize: '0.75rem', color: wordCount >= 10 ? 'var(--text-secondary)' : 'var(--color-stressed)', fontWeight: 500 }}>
                 {wordCount} words {wordCount < 10 && '(Write at least 10 words)'}
               </span>
             </div>
             <textarea
+              id="journal-text"
               className="textarea"
               rows={6}
               placeholder="How did study go today? Vented thoughts on mock scores, parents' comments, syllabus backlogs, sleeping cycles, or exam day fears. Aura will analyze these words for stress patterns..."
               value={text}
               onChange={(e) => setText(e.target.value)}
               style={{ resize: 'vertical' }}
+              aria-describedby="journal-word-counter"
             />
           </div>
 
           {/* Error Message */}
           {error && (
-            <div style={{
-              background: 'rgba(239, 68, 68, 0.08)',
-              border: '1px solid rgba(239, 68, 68, 0.2)',
-              borderRadius: 'var(--border-radius-sm)',
-              padding: '0.75rem',
-              display: 'flex',
-              gap: '0.5rem',
-              color: 'var(--color-anxious)',
-              fontSize: '0.85rem'
-            }}>
-              <AlertCircle size={16} style={{ flexShrink: 0, marginTop: '2px' }} />
+            <div 
+              role="alert"
+              style={{
+                background: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                borderRadius: 'var(--border-radius-sm)',
+                padding: '0.75rem',
+                display: 'flex',
+                gap: '0.5rem',
+                color: 'var(--color-anxious)',
+                fontSize: '0.85rem'
+              }}
+            >
+              <AlertCircle size={16} style={{ flexShrink: 0, marginTop: '2px' }} aria-hidden="true" />
               <span>{error}</span>
             </div>
           )}
@@ -229,12 +254,12 @@ export default function JournalForm({ apiKey, model, exam, setExam, addEntry, se
             >
               {isAnalyzing ? (
                 <>
-                  <BrainCircuit className="animate-breathe" size={18} />
+                  <BrainCircuit className="animate-breathe" size={18} aria-hidden="true" />
                   <span>Aura is analyzing stress triggers...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles size={18} />
+                  <Sparkles size={18} aria-hidden="true" />
                   <span>Analyze Journal & Log State</span>
                 </>
               )}

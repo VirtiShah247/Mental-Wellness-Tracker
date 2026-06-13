@@ -15,8 +15,8 @@
   
   /* Text */
   --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
   
   /* Brand & Accents */
   --indigo: #6366f1;
@@ -493,4 +493,20 @@ h1, h2, h3, h4, h5, h6 {
   .card {
     padding: 1.25rem;
   }
+}
+
+/* Accessibility Focus Outline Enhancements */
+*:focus-visible {
+  outline: 3px solid var(--indigo) !important;
+  outline-offset: 2px !important;
+}
+
+button:focus-visible, 
+.btn:focus-visible, 
+.input:focus-visible, 
+.textarea:focus-visible, 
+.select:focus-visible {
+  outline: 3px solid var(--indigo) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.4) !important;
 }

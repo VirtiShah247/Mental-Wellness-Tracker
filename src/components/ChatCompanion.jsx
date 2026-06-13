@@ -177,6 +177,7 @@ export default function ChatCompanion({ apiKey, model, exam, entries }) {
           
           <button
             onClick={clearChat}
+            aria-label="Clear chat history"
             style={{
               background: 'none',
               border: 'none',
@@ -188,20 +189,25 @@ export default function ChatCompanion({ apiKey, model, exam, entries }) {
               fontSize: '0.75rem'
             }}
           >
-            <Trash2 size={12} /> Clear Chat
+            <Trash2 size={12} aria-hidden="true" /> Clear Chat
           </button>
         </div>
 
         {/* Messages Feed */}
-        <div style={{
-          flex: 1,
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem',
-          paddingRight: '0.5rem',
-          marginBottom: '1rem'
-        }}>
+        <div 
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions"
+          style={{
+            flex: 1,
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+            paddingRight: '0.5rem',
+            marginBottom: '1rem'
+          }}
+        >
           {messages.map((msg) => {
             const isAI = msg.role === 'assistant';
             
@@ -218,32 +224,38 @@ export default function ChatCompanion({ apiKey, model, exam, entries }) {
                 }}
               >
                 {/* Avatar Icon */}
-                <div style={{
-                  width: '2rem',
-                  height: '2rem',
-                  borderRadius: '50%',
-                  background: isAI ? 'var(--indigo-glow)' : 'var(--violet-glow)',
-                  border: `1px solid ${isAI ? 'rgba(99, 102, 241, 0.3)' : 'rgba(139, 92, 246, 0.3)'}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
-                }}>
+                <div 
+                  aria-hidden="true"
+                  style={{
+                    width: '2rem',
+                    height: '2rem',
+                    borderRadius: '50%',
+                    background: isAI ? 'var(--indigo-glow)' : 'var(--violet-glow)',
+                    border: `1px solid ${isAI ? 'rgba(99, 102, 241, 0.3)' : 'rgba(139, 92, 246, 0.3)'}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}
+                >
                   {isAI ? <Bot size={14} color="var(--indigo)" /> : <User size={14} color="var(--violet)" />}
                 </div>
 
                 {/* Message Bubble */}
-                <div style={{
-                  background: isAI ? 'var(--bg-card)' : 'linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%)',
-                  border: isAI ? '1px solid var(--border-color)' : 'none',
-                  color: 'white',
-                  padding: '0.65rem 0.95rem',
-                  borderRadius: isAI ? '0 12px 12px 12px' : '12px 0 12px 12px',
-                  fontSize: '0.85rem',
-                  lineHeight: '1.5',
-                  textAlign: 'left',
-                  boxShadow: 'var(--shadow-sm)'
-                }}>
+                <div 
+                  aria-label={isAI ? "Aura said" : "You said"}
+                  style={{
+                    background: isAI ? 'var(--bg-card)' : 'linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%)',
+                    border: isAI ? '1px solid var(--border-color)' : 'none',
+                    color: 'white',
+                    padding: '0.65rem 0.95rem',
+                    borderRadius: isAI ? '0 12px 12px 12px' : '12px 0 12px 12px',
+                    fontSize: '0.85rem',
+                    lineHeight: '1.5',
+                    textAlign: 'left',
+                    boxShadow: 'var(--shadow-sm)'
+                  }}
+                >
                   {msg.content}
                 </div>
               </div>
@@ -252,16 +264,19 @@ export default function ChatCompanion({ apiKey, model, exam, entries }) {
 
           {/* AI Loading Bubble */}
           {isLoading && (
-            <div style={{ display: 'flex', gap: '0.75rem', alignSelf: 'flex-start' }}>
-              <div style={{
-                width: '2rem',
-                height: '2rem',
-                borderRadius: '50%',
-                background: 'var(--indigo-glow)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
+            <div style={{ display: 'flex', gap: '0.75rem', alignSelf: 'flex-start' }} aria-busy="true" aria-label="Aura is composing response">
+              <div 
+                aria-hidden="true"
+                style={{
+                  width: '2rem',
+                  height: '2rem',
+                  borderRadius: '50%',
+                  background: 'var(--indigo-glow)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
                 <Bot size={14} color="var(--indigo)" />
               </div>
               <div style={{
@@ -296,15 +311,17 @@ export default function ChatCompanion({ apiKey, model, exam, entries }) {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               disabled={isLoading}
+              aria-label="Chat message to Aura"
               style={{ fontSize: '0.85rem', padding: '0.65rem 1rem' }}
             />
             <button
               type="submit"
               className="btn btn-primary animate-fade-in"
               disabled={isLoading || !inputText.trim()}
+              aria-label="Send message to Aura"
               style={{ padding: '0 1rem', aspectRatio: '1', borderRadius: 'var(--border-radius-sm)' }}
             >
-              <Send size={16} />
+              <Send size={16} aria-hidden="true" />
             </button>
           </form>
         </div>

@@ -202,7 +202,13 @@ export default function WellnessDashboard({ entries, deleteEntry, streak, setAct
 
           {chartEntries.length > 1 ? (
             <div style={{ position: 'relative', width: '100%', overflowX: 'auto' }}>
-              <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} style={{ width: '100%', height: 'auto', minWidth: '400px' }}>
+              <svg 
+                viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
+                role="img" 
+                aria-label="Line chart showing weekly sentiment score trend from 10 to 100" 
+                style={{ width: '100%', height: 'auto', minWidth: '400px' }}
+              >
+                <title>Line chart showing weekly sentiment trend</title>
                 {/* Background lines */}
                 <line x1={padding} y1={padding} x2={chartWidth - padding} y2={padding} stroke="rgba(255, 255, 255, 0.05)" strokeDasharray="3,3" />
                 <line x1={padding} y1={chartHeight / 2} x2={chartWidth - padding} y2={chartHeight / 2} stroke="rgba(255, 255, 255, 0.05)" strokeDasharray="3,3" />
@@ -220,16 +226,26 @@ export default function WellnessDashboard({ entries, deleteEntry, streak, setAct
                     <stop offset="100%" stopColor="var(--indigo)" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
-                <path d={svgAreaPath} fill="url(#chartGlow)" />
+                <path d={svgAreaPath} fill="url(#chartGlow)" aria-hidden="true" />
 
                 {/* Draw Main Trend Line */}
-                <path d={svgPath} fill="none" stroke="var(--indigo)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                <path d={svgPath} fill="none" stroke="var(--indigo)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" />
 
                 {/* Data Points & Tooltips */}
                 {points.map((p, idx) => (
                   <g key={idx}>
-                    <circle cx={p.x} cy={p.y} r="5" fill="var(--bg-card)" stroke="var(--indigo)" strokeWidth="2" style={{ cursor: 'pointer' }} />
-                    <circle cx={p.x} cy={p.y} r="2" fill="white" />
+                    <circle 
+                      cx={p.x} 
+                      cy={p.y} 
+                      r="5" 
+                      fill="var(--bg-card)" 
+                      stroke="var(--indigo)" 
+                      strokeWidth="2" 
+                      tabIndex={0}
+                      aria-label={`Log score on ${p.date}: ${p.score} percent`}
+                      style={{ cursor: 'pointer' }} 
+                    />
+                    <circle cx={p.x} cy={p.y} r="2" fill="white" aria-hidden="true" />
                     
                     {/* Date label at bottom */}
                     <text x={p.x} y={chartHeight - 4} fill="var(--text-muted)" fontSize="7" textAnchor="middle">
@@ -269,7 +285,7 @@ export default function WellnessDashboard({ entries, deleteEntry, streak, setAct
 
         {/* History Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Calendar size={20} color="var(--indigo)" />
+          <Calendar size={20} color="var(--indigo)" aria-hidden="true" />
           <h2 style={{ fontSize: '1.35rem', margin: 0 }}>Journal History</h2>
         </div>
 
@@ -287,7 +303,16 @@ export default function WellnessDashboard({ entries, deleteEntry, streak, setAct
                 transition: 'all var(--transition-fast)'
               }}>
                 {/* Header row */}
-                <div className="flex-between" style={{ cursor: 'pointer' }} onClick={() => setExpandedEntryId(isExpanded ? null : entry.id)}>
+                <div 
+                  className="flex-between" 
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isExpanded}
+                  aria-controls={`entry-details-${entry.id}`}
+                  onClick={() => setExpandedEntryId(isExpanded ? null : entry.id)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedEntryId(isExpanded ? null : entry.id); } }}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div>
                     <h4 style={{ fontSize: '0.95rem', margin: 0, fontWeight: 700 }}>
                       {entryDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -299,8 +324,8 @@ export default function WellnessDashboard({ entries, deleteEntry, streak, setAct
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     {/* Score dot */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                      <span className="indicator" style={{ background: getMoodColor(entry.mood) }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }} role="status" aria-label={`Mood score: ${score}%`}>
+                      <span className="indicator" style={{ background: getMoodColor(entry.mood) }} aria-hidden="true" />
                       <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{score}%</span>
                     </div>
 
@@ -319,9 +344,9 @@ export default function WellnessDashboard({ entries, deleteEntry, streak, setAct
                       </span>
                     )}
 
-                    <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                      {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                    </button>
+                    <span style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
+                      {isExpanded ? <ChevronUp size={16} aria-hidden="true" /> : <ChevronDown size={16} aria-hidden="true" />}
+                    </span>
                   </div>
                 </div>
 
@@ -341,12 +366,15 @@ export default function WellnessDashboard({ entries, deleteEntry, streak, setAct
 
                 {/* Expanded content */}
                 {isExpanded && (
-                  <div style={{
-                    marginTop: '1rem',
-                    borderTop: '1px solid var(--border-color)',
-                    paddingTop: '0.85rem',
-                    animation: 'fadeIn var(--transition-fast) forwards'
-                  }}>
+                  <div 
+                    id={`entry-details-${entry.id}`}
+                    style={{
+                      marginTop: '1rem',
+                      borderTop: '1px solid var(--border-color)',
+                      paddingTop: '0.85rem',
+                      animation: 'fadeIn var(--transition-fast) forwards'
+                    }}
+                  >
                     {/* Mock Test Specifics */}
                     {entry.mockTest && (
                       <div style={{
@@ -396,6 +424,7 @@ export default function WellnessDashboard({ entries, deleteEntry, streak, setAct
                           }
                         }}
                         className="btn"
+                        aria-label="Delete this journal entry"
                         style={{
                           padding: '0.35rem 0.65rem',
                           background: 'none',
@@ -408,7 +437,7 @@ export default function WellnessDashboard({ entries, deleteEntry, streak, setAct
                           cursor: 'pointer'
                         }}
                       >
-                        <Trash2 size={12} />
+                        <Trash2 size={12} aria-hidden="true" />
                         <span>Delete Entry</span>
                       </button>
                     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Key, ShieldCheck, HelpCircle, Eye, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
 import { hasValidKey } from '../utils/openai';
 
@@ -8,6 +8,21 @@ export default function ApiSettingsModal({ isOpen, onClose, apiKey, setApiKey, m
   const [showKey, setShowKey] = useState(false);
   const [testingStatus, setTestingStatus] = useState(null); // 'loading', 'success', 'error'
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Close modal on Escape press for accessibility
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -74,22 +89,34 @@ export default function ApiSettingsModal({ isOpen, onClose, apiKey, setApiKey, m
       zIndex: 100,
       animation: 'fadeIn var(--transition-fast) forwards'
     }}>
-      <div className="card glass glow-border" style={{
-        width: '100%',
-        maxWidth: '500px',
-        padding: '2rem',
-        borderRadius: 'var(--border-radius-lg)',
-        boxShadow: 'var(--shadow-lg), 0 0 50px rgba(99, 102, 241, 0.1)',
-        animation: 'slideUp var(--transition-normal) forwards'
-      }}>
+      <div 
+        className="card glass glow-border" 
+        role="dialog" 
+        aria-modal="true" 
+        aria-labelledby="modal-title" 
+        aria-describedby="privacy-desc"
+        style={{
+          width: '100%',
+          maxWidth: '500px',
+          padding: '2rem',
+          borderRadius: 'var(--border-radius-lg)',
+          boxShadow: 'var(--shadow-lg), 0 0 50px rgba(99, 102, 241, 0.1)',
+          animation: 'slideUp var(--transition-normal) forwards'
+        }}
+      >
         {/* Header */}
         <div className="flex-between" style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Key size={20} color="var(--indigo)" />
-            <h2 style={{ fontSize: '1.25rem', margin: 0 }}>API & Wellness Settings</h2>
+            <Key size={20} color="var(--indigo)" aria-hidden="true" />
+            <h2 id="modal-title" style={{ fontSize: '1.25rem', margin: 0 }}>API & Wellness Settings</h2>
           </div>
-          <button onClick={onClose} className="btn btn-secondary" style={{ padding: '0.25rem', borderRadius: '50%' }}>
-            <X size={18} />
+          <button 
+            onClick={onClose} 
+            className="btn btn-secondary" 
+            aria-label="Close settings modal"
+            style={{ padding: '0.25rem', borderRadius: '50%' }}
+          >
+            <X size={18} aria-hidden="true" />
           </button>
         </div>
 
@@ -103,17 +130,18 @@ export default function ApiSettingsModal({ isOpen, onClose, apiKey, setApiKey, m
           gap: '0.75rem',
           marginBottom: '1.25rem'
         }}>
-          <ShieldCheck size={20} color="var(--color-energetic)" style={{ flexShrink: 0, marginTop: '2px' }} />
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'left' }}>
+          <ShieldCheck size={20} color="var(--color-energetic)" style={{ flexShrink: 0, marginTop: '2px' }} aria-hidden="true" />
+          <p id="privacy-desc" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'left' }}>
             <strong>Privacy Guard</strong>: Your API key is saved locally in your own browser cache. No remote backend storage is used. OpenAI is billed directly from your token budget.
           </p>
         </div>
 
         {/* Key Input */}
         <div style={{ marginBottom: '1.25rem', position: 'relative' }}>
-          <label className="label">OpenAI API Key (Optional)</label>
+          <label htmlFor="api-key-input" className="label">OpenAI API Key (Optional)</label>
           <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
             <input
+              id="api-key-input"
               type={showKey ? "text" : "password"}
               className="input"
               placeholder="sk-proj-..."
@@ -122,7 +150,9 @@ export default function ApiSettingsModal({ isOpen, onClose, apiKey, setApiKey, m
               style={{ paddingRight: '2.5rem' }}
             />
             <button
+              type="button"
               onClick={() => setShowKey(!showKey)}
+              aria-label={showKey ? "Hide API key" : "Show API key"}
               style={{
                 position: 'absolute',
                 right: '0.75rem',
@@ -132,7 +162,7 @@ export default function ApiSettingsModal({ isOpen, onClose, apiKey, setApiKey, m
                 color: 'var(--text-muted)'
               }}
             >
-              {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
+              {showKey ? <EyeOff size={16} aria-hidden="true" /> : <Eye size={16} aria-hidden="true" />}
             </button>
           </div>
           <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'left', marginTop: '0.35rem' }}>
@@ -142,8 +172,13 @@ export default function ApiSettingsModal({ isOpen, onClose, apiKey, setApiKey, m
 
         {/* Model dropdown */}
         <div style={{ marginBottom: '1.5rem' }}>
-          <label className="label">AI Model</label>
-          <select className="select" value={tempModel} onChange={(e) => setTempModel(e.target.value)}>
+          <label htmlFor="api-model-select" className="label">AI Model</label>
+          <select 
+            id="api-model-select"
+            className="select" 
+            value={tempModel} 
+            onChange={(e) => setTempModel(e.target.value)}
+          >
             <option value="gpt-4o-mini">GPT-4o Mini (Recommended - Fast & Cheap)</option>
             <option value="gpt-4o">GPT-4o (Deep Analysis & Detailed Responses)</option>
             <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Legacy support)</option>
@@ -153,13 +188,13 @@ export default function ApiSettingsModal({ isOpen, onClose, apiKey, setApiKey, m
         {/* Connection Test Output */}
         {testingStatus === 'loading' && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--indigo)' }}>
-            <div className="indicator animate-breathe" style={{ background: 'var(--indigo)' }} />
+            <div className="indicator animate-breathe" style={{ background: 'var(--indigo)' }} aria-hidden="true" />
             <span style={{ fontSize: '0.85rem' }}>Testing API credentials...</span>
           </div>
         )}
         {testingStatus === 'success' && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--color-energetic)' }}>
-            <CheckCircle2 size={16} />
+            <CheckCircle2 size={16} aria-hidden="true" />
             <span style={{ fontSize: '0.85rem' }}>Connection successful! Key is active and responding.</span>
           </div>
         )}
@@ -173,7 +208,7 @@ export default function ApiSettingsModal({ isOpen, onClose, apiKey, setApiKey, m
             textAlign: 'left'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-anxious)', marginBottom: '0.25rem' }}>
-              <AlertCircle size={16} />
+              <AlertCircle size={16} aria-hidden="true" />
               <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Connection Failed</span>
             </div>
             <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{errorMessage}</p>

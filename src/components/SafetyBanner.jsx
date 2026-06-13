@@ -62,7 +62,7 @@ export default function SafetyBanner({ setActiveTab }) {
         {/* Helplines section */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-            <PhoneCall size={20} color="var(--indigo)" />
+            <PhoneCall size={20} color="var(--indigo)" aria-hidden="true" />
             <h2 style={{ fontSize: '1.35rem', margin: 0 }}>Active Student Helplines</h2>
           </div>
 
@@ -82,14 +82,18 @@ export default function SafetyBanner({ setActiveTab }) {
                   </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0.25rem 0' }}>
-                  <a href={`tel:${line.phone.replace(/\s+/g, '')}`} style={{
-                    fontSize: '1.1rem',
-                    fontWeight: 800,
-                    color: 'var(--indigo)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.35rem'
-                  }}>
+                  <a 
+                    href={`tel:${line.phone.replace(/\s+/g, '')}`} 
+                    aria-label={`Call ${line.name} at ${line.phone}`}
+                    style={{
+                      fontSize: '1.1rem',
+                      fontWeight: 800,
+                      color: 'var(--indigo)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem'
+                    }}
+                  >
                     {line.phone}
                   </a>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>({line.available})</span>
